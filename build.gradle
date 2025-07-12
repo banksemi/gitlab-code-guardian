@@ -38,6 +38,7 @@ dependencies {
 	runtimeOnly "io.netty:netty-resolver"
 }
 
-tasks.named('test') {
+tasks.named('test') {\
+	systemProperty "spring.profiles.active", "test"
 	useJUnitPlatform()
 }
