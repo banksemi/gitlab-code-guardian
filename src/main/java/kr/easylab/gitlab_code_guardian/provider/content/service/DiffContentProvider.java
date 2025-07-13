@@ -20,8 +20,21 @@ public class DiffContentProvider implements ContentProvider {
     @Override
     public String getContentText() {
         List<DiffFile> diffs = mrReaderService.getDiff();
+        StringBuilder sb = new StringBuilder();
+        for (DiffFile diff : diffs) {
+            String filePath = (diff.getNewPath() != null && !diff.getNewPath().isEmpty())
+                    ? diff.getNewPath()
+                    : diff.getOldPath();
 
-        // TODO: 현재는 DiffFile 객체의 toString에 의존, 향후 LLM이 잘 인식할 수 있는 방향으로 개선 필요
-        return diffs.toString();
+            sb.append("--- File: ")
+                    .append(filePath)
+                    .append(" ---")
+                    .append(System.lineSeparator())
+                    .append(diff.getDiff())           // 실제 diff 내용
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+
+        }
+        return sb.toString();
     }
 }
