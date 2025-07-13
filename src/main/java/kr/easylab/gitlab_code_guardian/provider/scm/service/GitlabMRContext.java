@@ -1,16 +1,63 @@
 package kr.easylab.gitlab_code_guardian.provider.scm.service;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.gitlab4j.api.GitLabApi;
+import org.gitlab4j.api.GitLabApiException;
+import org.gitlab4j.api.models.Discussion;
+import org.gitlab4j.api.models.MergeRequest;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 @Scope(value="request", proxyMode= ScopedProxyMode.TARGET_CLASS)
 @Getter
 @Setter
 public class GitlabMRContext {
-    private String mrId;
+    private final GitLabApi gitLabApi;
+
+    private Long mrId;
     private String repositoryId;
+
+    @Cacheable(value = "mergeRequest", key = "#root.target.repositoryId + '_' + #root.target.mrId")
+    public MergeRequest getMergeRequest() {
+        MergeRequest mergeRequest = null;
+        try {
+            mergeRequest = gitLabApi.getMergeRequestApi().getMergeRequest(
+                    getRepositoryId(),
+                    getMrId()
+            );
+        } catch (GitLabApiException e) {
+            throw new RuntimeException(e);
+        }
+        return mergeRequest;
+    }
+
+    @Cacheable(value = "discussions", key="#root.target.repositoryId + '_' + #root.target.mrId")
+    public List<Discussion> getDiscussions() {
+        try {
+            return getGitLabApi()
+                    .getDiscussionsApi()
+                    .getMergeRequestDiscussions(getRepositoryId(),
+                            getMrId());
+        } catch (GitLabApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void validateContext() {
+        if (getRepositoryId() == null || getRepositoryId().isEmpty()) {
+            throw new IllegalArgumentException("repositoryId is required.");
+        }
+        if (getMrId() == null) {
+            throw new IllegalArgumentException("mrId is required.");
+        }
+    }
 }

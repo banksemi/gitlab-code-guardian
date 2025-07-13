@@ -12,8 +12,9 @@ public class MergeRequestPipeline {
     private final MergeRequestReviewService mergeRequestReviewService;
     private final NotificationService notificationService;
 
-    public void run() {
+    public MRReview runAndNotify() {
         MRReview review = mergeRequestReviewService.review();
         notificationService.sendNotification(review);
+        return review;
     }
 }
