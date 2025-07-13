@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -31,18 +32,22 @@ public class GoogleLLMService implements LLMService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
     private final GoogleSchemaMappingService googleSchemaMappingService;
+    private final SchemaExtractionService schemaExtractionService;
 
     public GoogleLLMService(
             @Value("${llm.google.base_url}") String baseURL,
             @Value("${llm.google.api_key}") String apiKey,
             @Value("${llm.google.model}") String model,
             ObjectMapper objectMapper,
-            GoogleSchemaMappingService googleSchemaMappingService) {
+            GoogleSchemaMappingService googleSchemaMappingService,
+            SchemaExtractionService schemaExtractionService
+    ) {
         this.baseURL = baseURL;
         this.apiKey = apiKey;
         this.model = model;
         this.objectMapper = objectMapper;
         this.googleSchemaMappingService = googleSchemaMappingService;
+        this.schemaExtractionService = schemaExtractionService;
 
         this.webClient = WebClient.builder()
                 .baseUrl(baseURL)
@@ -113,15 +118,14 @@ public class GoogleLLMService implements LLMService {
 
     @Override
     public <T> T generate(List<LLMMessage> messages, Class<T> clazz, LLMConfig config) {
-        ResolvedSchema resolvedSchema = ModelConverters.getInstance()
-                .resolveAsResolvedSchema(new AnnotatedType(clazz).resolveAsRef(false));
-
+        ResolvedSchema resolvedSchema = schemaExtractionService.extractSchema(clazz);
+        Map<String, Object> stringObjectMap = googleSchemaMappingService.mapToGoogleSchema(resolvedSchema.schema, resolvedSchema.referencedSchemas);
         String responseText = call(
                 config,
                 messages,
                 GenerationConfig.builder()
                         .responseMimeType("application/json")
-                        .responseSchema(googleSchemaMappingService.mapToGoogleSchema(resolvedSchema.schema))
+                        .responseSchema(stringObjectMap)
                         .build()
         );
 
