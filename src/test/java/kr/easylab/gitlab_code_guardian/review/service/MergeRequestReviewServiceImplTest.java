@@ -50,7 +50,7 @@ class MergeRequestReviewServiceImplTest {
                         LLMMessage.builder().role(LLMMessage.Role.USER).text("Content1").build()
                 )
         ));
-        MRReview response = new MRReview();
+        MRReview response = MRReview.builder().build();
         when(llmService.generate(anyList(), eq(MRReview.class), any(LLMConfig.class))).thenReturn(response);
 
         // When
@@ -78,7 +78,7 @@ class MergeRequestReviewServiceImplTest {
                         LLMMessage.builder().role(LLMMessage.Role.USER).text("Content1").build()
                 )
         ));
-        MRReview response = new MRReview();
+        MRReview response = MRReview.builder().build();
         when(llmService.generate(anyList(), eq(MRReview.class), any(LLMConfig.class))).thenReturn(response);
 
         // When

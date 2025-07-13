@@ -18,7 +18,7 @@ class MergeRequestPipelineTest {
         MergeRequestPipeline mergeRequestPipeline = new MergeRequestPipeline(
                 mockMergeRequestReviewService, mockNotificationService
         );
-        MRReview reviewResult = new MRReview();
+        MRReview reviewResult = MRReview.builder().build();
         when(mockMergeRequestReviewService.review()).thenReturn(reviewResult);
 
         // When
