@@ -22,7 +22,7 @@ class MergeRequestPipelineTest {
         when(mockMergeRequestReviewService.review()).thenReturn(reviewResult);
 
         // When
-        mergeRequestPipeline.run();
+        mergeRequestPipeline.runAndNotify();
 
         // Then
         InOrder inOrder = inOrder(mockMergeRequestReviewService, mockNotificationService);
