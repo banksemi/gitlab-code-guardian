@@ -8,6 +8,7 @@ import kr.easylab.gitlab_code_guardian.prompt.user.service.UserPromptService;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
 import kr.easylab.gitlab_code_guardian.review.dto.MRReview;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MergeRequestReviewServiceImpl implements MergeRequestReviewService {
     private final ContentAggregator contentAggregator;
     private final LLMService llmService;
@@ -39,6 +41,8 @@ public class MergeRequestReviewServiceImpl implements MergeRequestReviewService 
         messages.addAll(contentAggregator.aggregate());
 
         LLMConfig llmConfig = LLMConfig.builder().prompt(systemPrompt).build();
+        log.info("LLM Config: {}", llmConfig);
+        log.info("LLM Messages: {}", messages);
         return llmService.generate(messages, MRReview.class, llmConfig);
     }
 }

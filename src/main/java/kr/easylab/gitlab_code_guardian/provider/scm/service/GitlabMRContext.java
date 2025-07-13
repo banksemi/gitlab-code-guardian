@@ -51,7 +51,6 @@ public class GitlabMRContext {
         }
     }
 
-
     public void validateContext() {
         if (getRepositoryId() == null || getRepositoryId().isEmpty()) {
             throw new IllegalArgumentException("repositoryId is required.");
