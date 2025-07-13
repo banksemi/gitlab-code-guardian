@@ -35,9 +35,6 @@ class MergeRequestReviewServiceImplTest {
     private SystemPromptService systemPromptService;
 
     @Mock
-    private MRReaderService mrReaderService;
-
-    @Mock
     private LLMService llmService;
 
     @Test
@@ -47,8 +44,8 @@ class MergeRequestReviewServiceImplTest {
                 contentAggregator, llmService, userPromptService, systemPromptService
         );
         when(systemPromptService.getPrompt()).thenReturn("시스템 프롬프트");
-        when(userPromptService.getPrompt(mrReaderService)).thenReturn("유저 프롬프트");
-        when(contentAggregator.aggregate(mrReaderService)).thenReturn(new ArrayList<>(
+        when(userPromptService.getPrompt()).thenReturn("유저 프롬프트");
+        when(contentAggregator.aggregate()).thenReturn(new ArrayList<>(
                 List.of(
                         LLMMessage.builder().role(LLMMessage.Role.USER).text("Content1").build()
                 )
@@ -57,7 +54,7 @@ class MergeRequestReviewServiceImplTest {
         when(llmService.generate(anyList(), eq(MRReview.class), any(LLMConfig.class))).thenReturn(response);
 
         // When
-        MRReview review = mergeRequestReviewService.review(mrReaderService);
+        MRReview review = mergeRequestReviewService.review();
 
         // Then
         verify(llmService).generate(List.of(
@@ -75,8 +72,8 @@ class MergeRequestReviewServiceImplTest {
                 contentAggregator, llmService, userPromptService, systemPromptService
         );
         when(systemPromptService.getPrompt()).thenReturn("시스템 프롬프트");
-        when(userPromptService.getPrompt(mrReaderService)).thenReturn(""); // Empty user prompt
-        when(contentAggregator.aggregate(mrReaderService)).thenReturn(new ArrayList<>(
+        when(userPromptService.getPrompt()).thenReturn(""); // Empty user prompt
+        when(contentAggregator.aggregate()).thenReturn(new ArrayList<>(
                 List.of(
                         LLMMessage.builder().role(LLMMessage.Role.USER).text("Content1").build()
                 )
@@ -85,7 +82,7 @@ class MergeRequestReviewServiceImplTest {
         when(llmService.generate(anyList(), eq(MRReview.class), any(LLMConfig.class))).thenReturn(response);
 
         // When
-        MRReview review = mergeRequestReviewService.review(mrReaderService);
+        MRReview review = mergeRequestReviewService.review();
 
         // Then
         verify(llmService).generate(List.of(

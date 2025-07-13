@@ -10,29 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class EmptyUserPromptServiceTest {
-    @Mock
-    private MRReaderService mrReaderService;
-
     @Test
     void getPrompt_shouldReturnEmptyString() {
         // Given
         EmptyUserPromptService emptyUserPromptService = new EmptyUserPromptService();
 
         // When
-        String result = emptyUserPromptService.getPrompt(mrReaderService);
-
-        // Then
-        assertNotNull(result);
-        assertEquals("", result);
-    }
-
-    @Test
-    void getPrompt_withNullMRReaderService_shouldReturnEmptyString() {
-        // Given
-        EmptyUserPromptService emptyUserPromptService = new EmptyUserPromptService();
-
-        // When
-        String result = emptyUserPromptService.getPrompt(null);
+        String result = emptyUserPromptService.getPrompt();
 
         // Then
         assertNotNull(result);

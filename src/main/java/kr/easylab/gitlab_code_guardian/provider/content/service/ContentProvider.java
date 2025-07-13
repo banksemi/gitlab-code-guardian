@@ -4,5 +4,5 @@ import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
 
 public interface ContentProvider {
     public String getTitle();
-    public String getContentText(MRReaderService mrReaderService);
+    public String getContentText();
 }

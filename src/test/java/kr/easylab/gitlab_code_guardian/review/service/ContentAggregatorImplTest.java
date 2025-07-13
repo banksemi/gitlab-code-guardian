@@ -22,7 +22,7 @@ class ContentAggregatorImplTest {
         );
 
         // When
-        List<LLMMessage> messages = contentAggregator.aggregate(null);
+        List<LLMMessage> messages = contentAggregator.aggregate();
 
         // Then
         assertNotNull(messages);
@@ -35,19 +35,18 @@ class ContentAggregatorImplTest {
         // Given
         ContentProvider mockContentProvider1 = mock(ContentProvider.class);
         ContentProvider mockContentProvider2 = mock(ContentProvider.class);
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
 
         when(mockContentProvider1.getTitle()).thenReturn("Title 1");
-        when(mockContentProvider1.getContentText(mockMRReaderService)).thenReturn("Content 1");
+        when(mockContentProvider1.getContentText()).thenReturn("Content 1");
 
         when(mockContentProvider2.getTitle()).thenReturn("Title 2");
-        when(mockContentProvider2.getContentText(mockMRReaderService)).thenReturn("Content 2");
+        when(mockContentProvider2.getContentText()).thenReturn("Content 2");
 
         List<ContentProvider> contentProviders = List.of(mockContentProvider1, mockContentProvider2);
         ContentAggregatorImpl contentAggregator = new ContentAggregatorImpl(contentProviders);
 
         // When
-        List<LLMMessage> messages = contentAggregator.aggregate(mockMRReaderService);
+        List<LLMMessage> messages = contentAggregator.aggregate();
 
         // Then
         assertNotNull(messages);
@@ -65,9 +64,9 @@ class ContentAggregatorImplTest {
 
         // Verify that methods were called
         verify(mockContentProvider1).getTitle();
-        verify(mockContentProvider1).getContentText(mockMRReaderService);
+        verify(mockContentProvider1).getContentText();
         verify(mockContentProvider2).getTitle();
-        verify(mockContentProvider2).getContentText(mockMRReaderService);
+        verify(mockContentProvider2).getContentText();
     }
 
     @Test
@@ -80,19 +79,19 @@ class ContentAggregatorImplTest {
         MRReaderService mockMRReaderService = mock(MRReaderService.class);
 
         when(mockContentProvider1.getTitle()).thenReturn("Title 1");
-        when(mockContentProvider1.getContentText(mockMRReaderService)).thenReturn("Content 1");
+        when(mockContentProvider1.getContentText()).thenReturn("Content 1");
 
         when(mockContentProvider2.getTitle()).thenReturn("Title 2");
-        when(mockContentProvider2.getContentText(mockMRReaderService)).thenReturn(null);
+        when(mockContentProvider2.getContentText()).thenReturn(null);
 
         when(mockContentProvider3.getTitle()).thenReturn("Title 3");
-        when(mockContentProvider3.getContentText(mockMRReaderService)).thenReturn("");
+        when(mockContentProvider3.getContentText()).thenReturn("");
 
         List<ContentProvider> contentProviders = List.of(mockContentProvider1, mockContentProvider2, mockContentProvider3);
         ContentAggregatorImpl contentAggregator = new ContentAggregatorImpl(contentProviders);
 
         // When
-        List<LLMMessage> messages = contentAggregator.aggregate(mockMRReaderService);
+        List<LLMMessage> messages = contentAggregator.aggregate();
 
         // Then
         assertNotNull(messages);

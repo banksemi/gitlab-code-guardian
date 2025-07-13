@@ -15,12 +15,12 @@ public class ContentAggregatorImpl implements ContentAggregator {
     private final List<ContentProvider> contentProviders;
 
     @Override
-    public List<LLMMessage> aggregate(MRReaderService mrReaderService) {
+    public List<LLMMessage> aggregate() {
         List<LLMMessage> messages = new ArrayList<>();
         for (ContentProvider contentProvider : contentProviders) {
             String contentTitle = contentProvider.getTitle();
 
-            String content = contentProvider.getContentText(mrReaderService);
+            String content = contentProvider.getContentText();
             if (content != null && !content.isEmpty()) {
                 messages.add(
                         LLMMessage.builder()

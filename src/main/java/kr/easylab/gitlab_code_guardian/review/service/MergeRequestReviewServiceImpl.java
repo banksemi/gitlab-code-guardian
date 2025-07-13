@@ -21,22 +21,22 @@ public class MergeRequestReviewServiceImpl implements MergeRequestReviewService 
     private final UserPromptService userPromptService;
     private final SystemPromptService systemPromptService;
 
-    public MRReview review(MRReaderService mrReaderService) {
+    public MRReview review() {
         String systemPrompt = systemPromptService.getPrompt();
         List<LLMMessage> messages = new ArrayList<>();
 
-        String userPrompt = userPromptService.getPrompt(mrReaderService);
+        String userPrompt = userPromptService.getPrompt();
         if (userPrompt != null && !userPrompt.isEmpty()) {
             messages.add(
                     LLMMessage.builder()
                             .role(LLMMessage.Role.USER)
-                            .text(userPromptService.getPrompt(mrReaderService))
+                            .text(userPromptService.getPrompt())
                             .build()
             );
         }
 
         // 리뷰를 위한 MR 컨텍스트 추가
-        messages.addAll(contentAggregator.aggregate(mrReaderService));
+        messages.addAll(contentAggregator.aggregate());
 
         LLMConfig llmConfig = LLMConfig.builder().prompt(systemPrompt).build();
         return llmService.generate(messages, MRReview.class, llmConfig);

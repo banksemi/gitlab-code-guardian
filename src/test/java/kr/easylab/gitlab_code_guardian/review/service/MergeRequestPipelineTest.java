@@ -13,21 +13,20 @@ class MergeRequestPipelineTest {
     @Test
     void run_ShouldReviewAndSendNotificationInOrder() {
         // Given
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
         MergeRequestReviewService mockMergeRequestReviewService = mock(MergeRequestReviewService.class);
         NotificationService mockNotificationService = mock(NotificationService.class);
         MergeRequestPipeline mergeRequestPipeline = new MergeRequestPipeline(
                 mockMergeRequestReviewService, mockNotificationService
         );
         MRReview reviewResult = new MRReview();
-        when(mockMergeRequestReviewService.review(mockMRReaderService)).thenReturn(reviewResult);
+        when(mockMergeRequestReviewService.review()).thenReturn(reviewResult);
 
         // When
-        mergeRequestPipeline.run(mockMRReaderService);
+        mergeRequestPipeline.run();
 
         // Then
         InOrder inOrder = inOrder(mockMergeRequestReviewService, mockNotificationService);
-        inOrder.verify(mockMergeRequestReviewService, times(1)).review(mockMRReaderService);
+        inOrder.verify(mockMergeRequestReviewService, times(1)).review();
         inOrder.verify(mockNotificationService, times(1)).sendNotification(reviewResult);
     }
 }

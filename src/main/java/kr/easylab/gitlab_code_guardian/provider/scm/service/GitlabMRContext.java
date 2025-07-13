@@ -11,4 +11,6 @@ import org.springframework.stereotype.Service;
 @Getter
 @Setter
 public class GitlabMRContext {
+    private String mrId;
+    private String repositoryId;
 }

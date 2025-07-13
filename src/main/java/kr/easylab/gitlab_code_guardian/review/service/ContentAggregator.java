@@ -6,5 +6,5 @@ import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
 import java.util.List;
 
 public interface ContentAggregator {
-    List<LLMMessage> aggregate(MRReaderService mrReaderService);
+    List<LLMMessage> aggregate();
 }

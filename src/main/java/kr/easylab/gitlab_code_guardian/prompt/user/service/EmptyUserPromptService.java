@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmptyUserPromptService implements UserPromptService {
-    public String getPrompt(MRReaderService mrReaderService) {
+    public String getPrompt() {
         return "";
     }
 }
