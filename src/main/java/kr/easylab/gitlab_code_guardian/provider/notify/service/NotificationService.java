@@ -7,4 +7,5 @@ import kr.easylab.gitlab_code_guardian.review.dto.MRReview;
  */
 public interface NotificationService {
     void sendNotification(MRReview review);
+    void sendNotification(String message);
 }
