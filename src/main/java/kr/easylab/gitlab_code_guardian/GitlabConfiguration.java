@@ -1,6 +1,7 @@
 package kr.easylab.gitlab_code_guardian;
 
 import org.gitlab4j.api.GitLabApi;
+import org.gitlab4j.api.WebHookManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -14,5 +15,12 @@ public class GitlabConfiguration {
             @Value("${gitlab.token}") String token
     ) {
         return new GitLabApi(baseURL, token);
+    }
+
+    @Bean
+    WebHookManager webHookManager(
+            @Value("${gitlab.webhook_secret}") String webhookSecret
+    ) {
+        return new WebHookManager(webhookSecret);
     }
 }

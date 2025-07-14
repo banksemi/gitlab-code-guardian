@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GitlabCommentWriterService implements CommentWriterService {
+public class GitlabCommentSendingService implements CommentSendingService {
     private final GitlabMRContext gitlabMRContext;
     private final GitLabApi gitLabApi;
 

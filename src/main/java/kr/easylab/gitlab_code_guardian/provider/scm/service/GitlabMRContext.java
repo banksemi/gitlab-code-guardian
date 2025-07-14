@@ -8,6 +8,7 @@ import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Discussion;
 import org.gitlab4j.api.models.MergeRequest;
+import org.gitlab4j.api.webhook.NoteEvent;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -29,8 +30,12 @@ public class GitlabMRContext {
     private Long mrId;
     private String repositoryId;
 
-    @Cacheable(value = "mergeRequest", key = "#root.target.repositoryId + '_' + #root.target.mrId")
-    @Cacheable(value = "mergeRequest", key = "#root.target.sessionId + '_' + #root.target.repositoryId + '_' + #root.target.mrId")
+    private NoteEvent noteEvent;
+
+    @Cacheable(
+            value = "mergeRequest",
+            key = "#root.target.sessionId + '_' + #root.target.repositoryId + '_' + #root.target.mrId"
+    )
     public MergeRequest getMergeRequest() {
         log.info("Requesting gitLab API for merge request (sessionId: {}, repositoryId: {}, mrId: {})",
                 getSessionId(),

@@ -1,6 +1,6 @@
 package kr.easylab.gitlab_code_guardian.provider.notify.service;
 
-import kr.easylab.gitlab_code_guardian.provider.scm.service.CommentWriterService;
+import kr.easylab.gitlab_code_guardian.provider.scm.service.CommentSendingService;
 import kr.easylab.gitlab_code_guardian.review.dto.CodeBlockReview;
 import kr.easylab.gitlab_code_guardian.review.dto.MRReview;
 import lombok.RequiredArgsConstructor;
@@ -13,16 +13,16 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SCMCommentNotificationService implements NotificationService {
-    private final CommentWriterService commentWriterService;
+    private final CommentSendingService commentSendingService;
 
     @Override
     public void sendNotification(MRReview review) {
-        commentWriterService.writeComment(
+        commentSendingService.writeComment(
                 review.getSummary()
         );
 
         for (CodeBlockReview suggestion : review.getSuggestions()) {
-            commentWriterService.writeComment(
+            commentSendingService.writeComment(
                     suggestion.getFilePath(),
                     suggestion.getEndLine(),
                     suggestion.getComment()
@@ -32,6 +32,6 @@ public class SCMCommentNotificationService implements NotificationService {
 
     @Override
     public void sendNotification(String message) {
-        commentWriterService.writeComment(message);
+        commentSendingService.writeComment(message);
     }
 }
