@@ -22,10 +22,14 @@ public class SCMCommentNotificationService implements NotificationService {
         );
 
         for (CodeBlockReview suggestion : review.getSuggestions()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("**Priority: ").append(suggestion.getPriority()).append("**");
+            sb.append(System.lineSeparator()).append(System.lineSeparator());
+            sb.append(suggestion.getComment());
             commentSendingService.writeComment(
                     suggestion.getFilePath(),
                     suggestion.getEndLine(),
-                    suggestion.getComment()
+                    sb.toString()
             );
         }
     }

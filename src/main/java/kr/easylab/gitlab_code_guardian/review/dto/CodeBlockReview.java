@@ -5,6 +5,12 @@ import lombok.Data;
 
 @Data
 public class CodeBlockReview {
+    public enum ReviewPriority {
+        CRITICAL,
+        HIGH,
+        NORMAL,
+        MINOR
+    }
     @Schema(description = "이슈가 발견된 파일의 전체 경로")
     private final String filePath;
 
@@ -16,4 +22,7 @@ public class CodeBlockReview {
 
     @Schema(description = "코드 리뷰 코멘트")
     private final String comment;
+
+    @Schema(description = "우선순위")
+    private final ReviewPriority priority;
 }
