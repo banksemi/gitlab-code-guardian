@@ -17,10 +17,5 @@ public class GitlabConfiguration {
         return new GitLabApi(baseURL, token);
     }
 
-    @Bean
-    WebHookManager webHookManager(
-            @Value("${gitlab.webhook_secret}") String webhookSecret
-    ) {
-        return new WebHookManager(webhookSecret);
-    }
+
 }

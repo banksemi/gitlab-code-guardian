@@ -20,24 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RequiredArgsConstructor
 public class GitlabWebhookController {
     private final WebHookManager webHookManager;
-    private final GitlabMRContext gitlabMRContext;
-    private final MergeRequestPipeline mergeRequestPipeline;
-
-    @PostConstruct
-    public void init() {
-        webHookManager.addListener(new WebHookListener() {
-            @Override
-            public void onNoteEvent(NoteEvent noteEvent) {
-                String repositoryId = noteEvent.getProject().getPathWithNamespace();
-                Long mrId   = noteEvent.getMergeRequest().getIid();
-
-                gitlabMRContext.setMrId(mrId);
-                gitlabMRContext.setRepositoryId(repositoryId);
-                gitlabMRContext.setNoteEvent(noteEvent);
-                mergeRequestPipeline.runAndNotify();
-            }
-        });
-    }
+    
     @PostMapping("/gitlab/webhook")
     public void handleWebhook(
             @RequestHeader("X-Gitlab-Event") String event,
