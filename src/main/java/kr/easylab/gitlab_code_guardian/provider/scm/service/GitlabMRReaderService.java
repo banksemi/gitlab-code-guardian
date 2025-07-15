@@ -110,15 +110,12 @@ public class GitlabMRReaderService implements MRReaderService {
     @Override
     public String getFileContent(String filePath) {
         try {
-            Optional<String> latestCommitId = getLatestCommitId();
-            if (latestCommitId.isEmpty())
-                throw new RuntimeException("최근 커밋 정보를 찾을 수 없음");
-
-            // MR의 소스 브랜치에서 파일 내용 조회
+            MergeRequest mr = gitlabMRContext.getMergeRequest();
+            DiffRef refs = mr.getDiffRefs();
             return gitlabMRContext.getGitLabApi()
                     .getRepositoryFileApi()
-                    .getFile(gitlabMRContext.getRepositoryId(), filePath, latestCommitId.get())
-                    .getContent();
+                    .getFile(gitlabMRContext.getRepositoryId(), filePath,refs.getHeadSha()).getDecodedContentAsString();
+
         } catch (GitLabApiException e) {
             log.error("파일 내용을 가져오는데 실패했습니다.", e);
             return null;
