@@ -14,6 +14,6 @@ public class ConsoleNotificationService implements NotificationService {
 
     @Override
     public void sendNotification(String message) {
-        log.info("단일 메세지 {}", message);
+        log.info("단일 메세지: {}", message);
     }
 }

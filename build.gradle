@@ -38,6 +38,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	runtimeOnly "io.netty:netty-resolver"
 }

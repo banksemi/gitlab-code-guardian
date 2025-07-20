@@ -1,5 +1,6 @@
 package kr.easylab.gitlab_code_guardian.provider.notify.service;
 
+import kr.easylab.gitlab_code_guardian.provider.notify.service.util.SuggestionFormatter;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.CommentSendingService;
 import kr.easylab.gitlab_code_guardian.review.dto.CodeBlockReview;
 import kr.easylab.gitlab_code_guardian.review.dto.MRReview;
@@ -14,28 +15,37 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SCMCommentNotificationService implements NotificationService {
     private final CommentSendingService commentSendingService;
+    private final SuggestionFormatter suggestionFormatter;
 
     @Override
     public void sendNotification(MRReview review) {
-        commentSendingService.writeComment(
-                review.getSummary()
-        );
+        if (review == null) {
+            log.warn("Null review: {}", review);
+            return;
+        }
+
+        String summary = review.getSummary();
+        if (summary != null && !summary.isEmpty()) {
+            commentSendingService.writeComment(summary);
+        } else {
+            log.info("Null or empty summary: {}", summary);
+        }
 
         for (CodeBlockReview suggestion : review.getSuggestions()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("**Priority: ").append(suggestion.getPriority()).append("**");
-            sb.append(System.lineSeparator()).append(System.lineSeparator());
-            sb.append(suggestion.getComment());
             commentSendingService.writeComment(
                     suggestion.getFilePath(),
                     suggestion.getEndLine(),
-                    sb.toString()
+                    suggestionFormatter.format(suggestion)
             );
         }
     }
 
     @Override
     public void sendNotification(String message) {
+        if (message == null || message.isEmpty()) {
+            log.warn("Null or empty message: {}", message);
+            return;
+        }
         commentSendingService.writeComment(message);
     }
 }
