@@ -23,7 +23,7 @@ public class DiscussionContentProvider implements ContentProvider {
     public String getContentText() {
         List<MRDiscussion> discussions = mrReaderService.getThreads();
 
-        if (discussions.isEmpty()) {
+        if (discussions == null || discussions.isEmpty()) {
             return "";
         }
 
@@ -31,7 +31,7 @@ public class DiscussionContentProvider implements ContentProvider {
 
         for (MRDiscussion discussion : discussions) {
             List<MessageBase> comments = discussion.getComments();
-            if (comments.isEmpty()) {
+            if (comments == null || comments.isEmpty()) {
                 continue;
             }
 
@@ -60,11 +60,9 @@ public class DiscussionContentProvider implements ContentProvider {
                     .append(System.lineSeparator())
                     .append(threadText)
                     .append(System.lineSeparator())
-                    .append("---");
-
-            if (!discussionsText.isEmpty()) {
-                discussionsText.append(System.lineSeparator()).append(System.lineSeparator());
-            }
+                    .append("---")
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
         }
 
         return discussionsText.toString().trim();
