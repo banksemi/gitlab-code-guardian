@@ -1,0 +1,9 @@
+services:
+  gitlab-code-guardian:
+    build: .
+    container_name: gitlab-code-guardian
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    restart: unless-stopped
