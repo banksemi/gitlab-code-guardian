@@ -14,6 +14,11 @@ import java.util.List;
 public class MRReview {
     private final String summary;
 
-    @ArraySchema(minItems = 1, maxItems = 10, schema = @Schema(implementation = CodeBlockReview.class, description = "코드 지정을 통해 수정을 제안할 부분"))
+    @Schema(description = "수정 제안 목록 (해결되지 않고 수정이 필요한 항목만 언급합니다)")
+    @ArraySchema(
+            minItems = 1,
+            maxItems = 10,
+            schema = @Schema(implementation = CodeBlockReview.class)
+    )
     private final List<CodeBlockReview> suggestions = List.of();
 }
