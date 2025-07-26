@@ -14,10 +14,10 @@ public class CodeBlockReview {
     @Schema(description = "이슈가 발견된 파일의 전체 경로")
     private final String filePath;
 
-    @Schema(description = "코드 리뷰 대상 영역의 시작 줄 번호")
+    @Schema(description = "코드 리뷰 영역의 시작 줄 번호")
     private final Long startLine;
 
-    @Schema(description = "코드 리뷰 대상 영역의 마지막 줄 번호")
+    @Schema(description = "코드 리뷰 영역의 마지막 줄 번호")
     private final Long endLine;
 
     @Schema(description = "코드 리뷰 코멘트")

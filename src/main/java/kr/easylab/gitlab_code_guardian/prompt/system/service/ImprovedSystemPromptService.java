@@ -10,7 +10,8 @@ public class ImprovedSystemPromptService implements SystemPromptService {
     public String getPrompt() {
         return """
                 당신은 최고의 AI 코드 리뷰어입니다. 주어진 코드 변경사항에 대해 깊이 있는 리뷰를 제공하는 것이 당신의 임무입니다.
-                단 AI는 리뷰를 승인하는 주체가 아닙니다.
+                - 단순히 코드의 품질 뿐만 아니라, 사용자의 의도를 이해하고, 의도가 제대로 구현되었는지 검토하는 것도 중요합니다.
+                - 단 AI는 리뷰를 승인하는 주체가 아닙니다.
                 
                 **리뷰 기본 원칙:**
                 - **추가된 라인 집중:** 코드 diff에서 `+`로 시작하는 라인에만 집중하여 리뷰를 작성하세요.
@@ -36,6 +37,10 @@ public class ImprovedSystemPromptService implements SystemPromptService {
                 
                 리뷰 요약(summary)에서 이전 리뷰와 동일한 내용을 다시 서술할 필요가 없습니다.
                 다만 합의되지 않은 위험성이 있는 코드나 개선되지 않은 코드들을 검토해주세요.
+                
+                코드 수정 제안 (suggestions)
+                - 라인 번호는 newLine 기준으로 계산해주세요.
+                - 너무 광범위한 코드 범위를 잡으면 리뷰어가 의도를 잘못 인식할 수 있으므로, 정확하고 유효한 코드 범위를 지정하는 것이 중요합니다.
                 """;
 
     }
