@@ -1,7 +1,6 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
-import kr.easylab.gitlab_code_guardian.provider.scm.dto.DiffFile;
-import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
+import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +9,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FileMapContentProvider implements ContentProvider {
-    private final MRReaderService mrReaderService;
+    private final ShaFileSnapshotService shaFileSnapshotService;
 
     @Override
     public String getTitle() {
@@ -19,7 +18,7 @@ public class FileMapContentProvider implements ContentProvider {
 
     @Override
     public String getContentText() {
-        List<String> diffs = mrReaderService.getFilePaths();
+        List<String> diffs = shaFileSnapshotService.getFilePaths();
         return String.join("\n", diffs);
     }
 }

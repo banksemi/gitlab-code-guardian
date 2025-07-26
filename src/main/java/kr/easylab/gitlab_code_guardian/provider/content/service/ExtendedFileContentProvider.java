@@ -1,18 +1,15 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
-import kr.easylab.gitlab_code_guardian.llm.dto.LLMConfig;
-import kr.easylab.gitlab_code_guardian.llm.dto.LLMMessage;
-import kr.easylab.gitlab_code_guardian.llm.service.LLMService;
 import kr.easylab.gitlab_code_guardian.provider.content.dto.FilePathsResponse;
 import kr.easylab.gitlab_code_guardian.provider.content.service.util.RelevantFilePathFinder;
-import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
+import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class ExtendedFileContentProvider implements ContentProvider {
-    private final MRReaderService mrReaderService;
+    private final ShaFileSnapshotService shaFileSnapshotService;
     private final RelevantFilePathFinder relevantFilePathFinder;
     private final DiffContentProvider diffContentProvider;
 
@@ -25,7 +22,7 @@ public class ExtendedFileContentProvider implements ContentProvider {
     public String getContentText() {
         // 수정 내용과 연관성 있는 파일들을 식별
         FilePathsResponse pathsResponse = relevantFilePathFinder.findRelevantFilePaths(
-                mrReaderService.getFilePaths(),
+                shaFileSnapshotService.getFilePaths(),
                 diffContentProvider.getContentText()
         );
 
@@ -34,7 +31,7 @@ public class ExtendedFileContentProvider implements ContentProvider {
         for (String path : pathsResponse.getFilePaths()) {
             sb.append("**").append(path).append("**").append(System.lineSeparator());
             sb.append("```").append(System.lineSeparator());
-            sb.append(mrReaderService.getFileContent(path)).append(System.lineSeparator());
+            sb.append(shaFileSnapshotService.getFileContent(path)).append(System.lineSeparator());
             sb.append("```").append(System.lineSeparator());
             sb.append(System.lineSeparator());
         }

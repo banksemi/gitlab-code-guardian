@@ -1,7 +1,7 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.DiffFile;
-import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
+import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +17,8 @@ class DiffContentProviderTest {
     @DisplayName("getTitle 메서드가 'Diff'를 반환하는지 확인합니다.")
     void getTitle_shouldReturnDiff() {
         // Given
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        DiffContentProvider diffContentProvider = new DiffContentProvider(mockMRReaderService);
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
         String title = diffContentProvider.getTitle();
@@ -31,17 +31,17 @@ class DiffContentProviderTest {
     @DisplayName("diff 파일이 없을 때 빈 문자열이 반환되는지 확인합니다.")
     void getContentText_whenNoDiffFiles_shouldReturnEmptyString() {
         // Given
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        when(mockMRReaderService.getDiff()).thenReturn(new ArrayList<>());
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        when(mockShaFileSnapshotService.getDiff()).thenReturn(new ArrayList<>());
 
-        DiffContentProvider diffContentProvider = new DiffContentProvider(mockMRReaderService);
+        DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
         String content = diffContentProvider.getContentText();
 
         // Then
         assertEquals("", content);
-        verify(mockMRReaderService).getDiff();
+        verify(mockShaFileSnapshotService).getDiff();
     }
 
     @Test
@@ -54,10 +54,10 @@ class DiffContentProviderTest {
                 .diff("123123")
                 .build();
 
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        when(mockMRReaderService.getDiff()).thenReturn(List.of(diffFile));
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        when(mockShaFileSnapshotService.getDiff()).thenReturn(List.of(diffFile));
 
-        DiffContentProvider diffContentProvider = new DiffContentProvider(mockMRReaderService);
+        DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
         String content = diffContentProvider.getContentText();
@@ -67,7 +67,7 @@ class DiffContentProviderTest {
                          "123123" + System.lineSeparator() +
                          System.lineSeparator();
         assertEquals(expected, content);
-        verify(mockMRReaderService).getDiff();
+        verify(mockShaFileSnapshotService).getDiff();
     }
 
     @Test
@@ -86,10 +86,10 @@ class DiffContentProviderTest {
                 .diff("another deleted file content")
                 .build();
 
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        when(mockMRReaderService.getDiff()).thenReturn(List.of(diffFile1, diffFile2));
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        when(mockShaFileSnapshotService.getDiff()).thenReturn(List.of(diffFile1, diffFile2));
 
-        DiffContentProvider diffContentProvider = new DiffContentProvider(mockMRReaderService);
+        DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
         String content = diffContentProvider.getContentText();
@@ -99,7 +99,7 @@ class DiffContentProviderTest {
         assertTrue(content.contains("--- File: src/main/java/AnotherDeletedFile.java ---"));
         assertTrue(content.contains("deleted file content"));
         assertTrue(content.contains("another deleted file content"));
-        verify(mockMRReaderService).getDiff();
+        verify(mockShaFileSnapshotService).getDiff();
     }
 
     @Test
@@ -116,10 +116,10 @@ class DiffContentProviderTest {
                 .diff("diff content 2")
                 .build();
 
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        when(mockMRReaderService.getDiff()).thenReturn(List.of(diffFile1, diffFile2));
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        when(mockShaFileSnapshotService.getDiff()).thenReturn(List.of(diffFile1, diffFile2));
 
-        DiffContentProvider diffContentProvider = new DiffContentProvider(mockMRReaderService);
+        DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
         String content = diffContentProvider.getContentText();
@@ -132,6 +132,6 @@ class DiffContentProviderTest {
 
         String[] parts = content.split(System.lineSeparator() + System.lineSeparator());
         assertEquals(2, parts.length);
-        verify(mockMRReaderService).getDiff();
+        verify(mockShaFileSnapshotService).getDiff();
     }
 }

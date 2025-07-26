@@ -1,6 +1,6 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
-import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
+import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +15,8 @@ class FileMapContentProviderTest {
     @Test
     void getTitle() {
         // Given
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockMRReaderService);
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockShaFileSnapshotService);
 
         // When
         String title = fileMapContentProvider.getTitle();
@@ -29,17 +29,17 @@ class FileMapContentProviderTest {
     @DisplayName("파일 경로가 없을 때 빈 문자열이 반환되는지 확인합니다.")
     void getContentText_whenNoFilePaths_shouldReturnEmptyString() {
         // Given
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        when(mockMRReaderService.getFilePaths()).thenReturn(new ArrayList<>());
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        when(mockShaFileSnapshotService.getFilePaths()).thenReturn(new ArrayList<>());
 
-        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockMRReaderService);
+        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockShaFileSnapshotService);
 
         // When
         String content = fileMapContentProvider.getContentText();
 
         // Then
         assertEquals("", content);
-        verify(mockMRReaderService).getFilePaths();
+        verify(mockShaFileSnapshotService).getFilePaths();
     }
 
     @Test
@@ -47,17 +47,17 @@ class FileMapContentProviderTest {
     void getContentText_withSingleFilePath_shouldReturnCorrectly() {
         // Given
         List<String> filePaths = List.of("src/main/java/Test.java");
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        when(mockMRReaderService.getFilePaths()).thenReturn(filePaths);
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        when(mockShaFileSnapshotService.getFilePaths()).thenReturn(filePaths);
 
-        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockMRReaderService);
+        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockShaFileSnapshotService);
 
         // When
         String content = fileMapContentProvider.getContentText();
 
         // Then
         assertEquals("src/main/java/Test.java", content);
-        verify(mockMRReaderService).getFilePaths();
+        verify(mockShaFileSnapshotService).getFilePaths();
     }
 
     @Test
@@ -69,10 +69,10 @@ class FileMapContentProviderTest {
                 "src/main/java/File2.java",
                 "src/test/java/TestFile.java"
         );
-        MRReaderService mockMRReaderService = mock(MRReaderService.class);
-        when(mockMRReaderService.getFilePaths()).thenReturn(filePaths);
+        ShaFileSnapshotService mockShaFileSnapshotService = mock(ShaFileSnapshotService.class);
+        when(mockShaFileSnapshotService.getFilePaths()).thenReturn(filePaths);
 
-        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockMRReaderService);
+        FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockShaFileSnapshotService);
 
         // When
         String content = fileMapContentProvider.getContentText();
@@ -80,7 +80,7 @@ class FileMapContentProviderTest {
         // Then
         String expected = "src/main/java/File1.java\nsrc/main/java/File2.java\nsrc/test/java/TestFile.java";
         assertEquals(expected, content);
-        verify(mockMRReaderService).getFilePaths();
+        verify(mockShaFileSnapshotService).getFilePaths();
     }
 
 }
