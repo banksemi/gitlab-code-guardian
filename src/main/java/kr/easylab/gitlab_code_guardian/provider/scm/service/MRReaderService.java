@@ -7,6 +7,8 @@ import kr.easylab.gitlab_code_guardian.provider.scm.dto.MessageBase;
 import java.util.List;
 
 public interface MRReaderService {
+    Boolean isAvailable();
+
     /** MR 제목을 반환합니다. */
     String getTitle();
 

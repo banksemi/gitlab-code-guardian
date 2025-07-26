@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -37,10 +38,10 @@ class ContentAggregatorImplTest {
         ContentProvider mockContentProvider2 = mock(ContentProvider.class);
 
         when(mockContentProvider1.getTitle()).thenReturn("Title 1");
-        when(mockContentProvider1.getContentText()).thenReturn("Content 1");
+        when(mockContentProvider1.getContentText()).thenReturn(Optional.of("Content 1"));
 
         when(mockContentProvider2.getTitle()).thenReturn("Title 2");
-        when(mockContentProvider2.getContentText()).thenReturn("Content 2");
+        when(mockContentProvider2.getContentText()).thenReturn(Optional.of("Content 2"));
 
         List<ContentProvider> contentProviders = List.of(mockContentProvider1, mockContentProvider2);
         ContentAggregatorImpl contentAggregator = new ContentAggregatorImpl(contentProviders);
@@ -79,13 +80,13 @@ class ContentAggregatorImplTest {
         MRReaderService mockMRReaderService = mock(MRReaderService.class);
 
         when(mockContentProvider1.getTitle()).thenReturn("Title 1");
-        when(mockContentProvider1.getContentText()).thenReturn("Content 1");
+        when(mockContentProvider1.getContentText()).thenReturn(Optional.of("Content 1"));
 
         when(mockContentProvider2.getTitle()).thenReturn("Title 2");
-        when(mockContentProvider2.getContentText()).thenReturn(null);
+        when(mockContentProvider2.getContentText()).thenReturn(Optional.empty());
 
         when(mockContentProvider3.getTitle()).thenReturn("Title 3");
-        when(mockContentProvider3.getContentText()).thenReturn("");
+        when(mockContentProvider3.getContentText()).thenReturn(Optional.of(""));
 
         List<ContentProvider> contentProviders = List.of(mockContentProvider1, mockContentProvider2, mockContentProvider3);
         ContentAggregatorImpl contentAggregator = new ContentAggregatorImpl(contentProviders);

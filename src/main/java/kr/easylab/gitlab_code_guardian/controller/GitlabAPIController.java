@@ -24,7 +24,7 @@ public class GitlabAPIController {
     private @Value("${gitlab.repository}") String repositoryName;
     private @Value("${gitlab.webhook_secret}") String webhookSecret;
 
-    @GetMapping("/gitlab/merge-requests/{mrId}/review")
+    @GetMapping("/gitlab/review/merge-requests/{mrId}")
     public MRReview review(
             @PathVariable Long mrId,
             @RequestHeader(name = "Authorization") String key
@@ -35,6 +35,23 @@ public class GitlabAPIController {
         }
         gitlabMRContext.setMrId(mrId);
         gitlabMRContext.setRepositoryId(repositoryName);
+        MRReview review = mergeRequestReviewService.review();
+        log.info("Review: {}", review);
+        return review;
+    }
+
+    @PostMapping("/gitlab/review/ref")
+    public MRReview review(
+            @RequestBody RefRequest refRequest,
+            @RequestHeader(name = "Authorization") String key
+    ) {
+        key = key.replace("Bearer ", "");
+        if (!key.equals(webhookSecret)) {
+            throw new IllegalArgumentException("Invalid key.");
+        }
+        gitlabMRContext.setRepositoryId(repositoryName);
+        gitlabMRContext.setBaseSha(refRequest.getBaseRef());
+        gitlabMRContext.setHeadSha(refRequest.getHeadRef());
         MRReview review = mergeRequestReviewService.review();
         log.info("Review: {}", review);
         return review;

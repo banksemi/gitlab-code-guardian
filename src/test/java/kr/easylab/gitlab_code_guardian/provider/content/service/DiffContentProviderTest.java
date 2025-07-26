@@ -1,5 +1,6 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
+import kr.easylab.gitlab_code_guardian.provider.content.service.sha.DiffContentProvider;
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.DiffFile;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +38,7 @@ class DiffContentProviderTest {
         DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
-        String content = diffContentProvider.getContentText();
+        String content = diffContentProvider.getContentText().orElse("");
 
         // Then
         assertEquals("", content);
@@ -60,12 +61,11 @@ class DiffContentProviderTest {
         DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
-        String content = diffContentProvider.getContentText();
+        String content = diffContentProvider.getContentText().orElse("");
 
         // Then
         String expected = "--- File: src/main/java/Test.java ---" + System.lineSeparator() +
-                         "123123" + System.lineSeparator() +
-                         System.lineSeparator();
+                         "123123";
         assertEquals(expected, content);
         verify(mockShaFileSnapshotService).getDiff();
     }
@@ -92,7 +92,7 @@ class DiffContentProviderTest {
         DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
-        String content = diffContentProvider.getContentText();
+        String content = diffContentProvider.getContentText().orElse("");
 
         // Then
         assertTrue(content.contains("--- File: src/main/java/DeletedFile.java ---"));
@@ -122,7 +122,7 @@ class DiffContentProviderTest {
         DiffContentProvider diffContentProvider = new DiffContentProvider(mockShaFileSnapshotService);
 
         // When
-        String content = diffContentProvider.getContentText();
+        String content = diffContentProvider.getContentText().orElse("");
 
         // Then
         assertTrue(content.contains("--- File: file1.java ---"));

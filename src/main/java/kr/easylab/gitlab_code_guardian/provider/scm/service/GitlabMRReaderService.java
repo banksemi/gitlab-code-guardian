@@ -21,6 +21,11 @@ public class GitlabMRReaderService implements MRReaderService {
     private final GitlabMRContext gitlabMRContext;
 
     @Override
+    public Boolean isAvailable() {
+        return gitlabMRContext.getMrId() != null;
+    }
+
+    @Override
     public String getTitle() {
         return gitlabMRContext.getMergeRequest().getTitle();
     }

@@ -1,5 +1,6 @@
-package kr.easylab.gitlab_code_guardian.provider.content.service;
+package kr.easylab.gitlab_code_guardian.provider.content.service.mr;
 
+import kr.easylab.gitlab_code_guardian.provider.content.service.ContentProvider;
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.MRDiscussion;
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.MessageBase;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,12 +22,14 @@ public class DiscussionContentProvider implements ContentProvider {
     }
 
     @Override
-    public String getContentText() {
+    public Optional<String> getContentText() {
+        if (!mrReaderService.isAvailable())
+            return Optional.empty();
+
         List<MRDiscussion> discussions = mrReaderService.getThreads();
 
-        if (discussions == null || discussions.isEmpty()) {
-            return "";
-        }
+        if (discussions == null || discussions.isEmpty())
+            return Optional.empty();
 
         StringBuilder discussionsText = new StringBuilder();
 
@@ -65,6 +69,6 @@ public class DiscussionContentProvider implements ContentProvider {
                     .append(System.lineSeparator());
         }
 
-        return discussionsText.toString().trim();
+        return Optional.of(discussionsText.toString().trim());
     }
 }

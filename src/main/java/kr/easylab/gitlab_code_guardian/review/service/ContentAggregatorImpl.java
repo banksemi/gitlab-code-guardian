@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,15 +21,16 @@ public class ContentAggregatorImpl implements ContentAggregator {
         for (ContentProvider contentProvider : contentProviders) {
             String contentTitle = contentProvider.getTitle();
 
-            String content = contentProvider.getContentText();
-            if (content != null && !content.isEmpty()) {
-                messages.add(
-                        LLMMessage.builder()
-                                .role(LLMMessage.Role.USER)
-                                .text("## " + contentTitle + "\n" + content)
-                                .build()
-                );
-            }
+            Optional<String> content = contentProvider.getContentText();
+            if (content.isEmpty() || content.orElse("").isEmpty())
+                continue;
+
+            messages.add(
+                    LLMMessage.builder()
+                            .role(LLMMessage.Role.USER)
+                            .text("## " + contentTitle + "\n" + content.get())
+                            .build()
+            );
         }
         return messages;
     }

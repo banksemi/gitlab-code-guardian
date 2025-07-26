@@ -1,5 +1,6 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
+import kr.easylab.gitlab_code_guardian.provider.content.service.mr.DiscussionContentProvider;
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.MRDiscussion;
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.MessageBase;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.MRReaderService;
@@ -48,28 +49,32 @@ class DiscussionContentProviderTest {
     @NullAndEmptySource
     @DisplayName("달려있는 코멘트가 없을 때 빈 문자열을 반환")
     void getContentText_EmptyComment(List<MRDiscussion> comments) {
+        when(mrReaderService.isAvailable()).thenReturn(true);
         when(mrReaderService.getThreads()).thenReturn(comments);
         
-        String content = discussionContentProvider.getContentText();
+        String content = discussionContentProvider.getContentText().orElse("");
         
         assertEquals("", content);
+        verify(mrReaderService, times(1)).isAvailable();
         verify(mrReaderService, times(1)).getThreads();
     }
 
     @Test
     @DisplayName("한개의 코멘트가 달려있을 때")
     void getContentText_SingleComment() {
+        when(mrReaderService.isAvailable()).thenReturn(true);
         when(mrReaderService.getThreads()).thenReturn(
                 List.of(createDiscussion(createMessage("user1", "comment")))
         );
 
-        String content = discussionContentProvider.getContentText();
+        String content = discussionContentProvider.getContentText().orElse("");
         
         String expected = "---" + System.lineSeparator() +
                 "**Author: @user1**" + System.lineSeparator() +
                 "comment" + System.lineSeparator() +
                 "---";
         assertEquals(expected, content);
+        verify(mrReaderService, times(1)).isAvailable();
         verify(mrReaderService, times(1)).getThreads();
     }
 
@@ -77,19 +82,22 @@ class DiscussionContentProviderTest {
     @NullAndEmptySource
     @DisplayName("한개의 Discussion이 있지만 코멘트가 없는 경우")
     void getContentText_SingleDiscussion_EmptyComment(List<MessageBase> comments) {
+        when(mrReaderService.isAvailable()).thenReturn(true);
         when(mrReaderService.getThreads()).thenReturn(
                 List.of(MRDiscussion.builder().comments(comments).build())
         );
         
-        String content = discussionContentProvider.getContentText();
+        String content = discussionContentProvider.getContentText().orElse("");
         
         assertEquals("", content);
+        verify(mrReaderService, times(1)).isAvailable();
         verify(mrReaderService, times(1)).getThreads();
     }
 
     @Test
     @DisplayName("한개의 토론에 여러개의 답글이 달렸을 때")
     void getContentText_SingleDiscussion_MultipleComments() {
+        when(mrReaderService.isAvailable()).thenReturn(true);
         when(mrReaderService.getThreads()).thenReturn(
                 List.of(createDiscussion(
                         createMessage("user1", "첫 번째 댓글"),
@@ -109,15 +117,17 @@ class DiscussionContentProviderTest {
                 "> 세 번째 댓글" + System.lineSeparator() +
                 "---";
                 
-        String content = discussionContentProvider.getContentText();
+        String content = discussionContentProvider.getContentText().orElse("");
         
         assertEquals(expected, content);
+        verify(mrReaderService, times(1)).isAvailable();
         verify(mrReaderService, times(1)).getThreads();
     }
 
     @Test
     @DisplayName("여러개의 토론이 달렸을 때")
     void getContentText_MultipleDiscussions() {
+        when(mrReaderService.isAvailable()).thenReturn(true);
         when(mrReaderService.getThreads()).thenReturn(
                 List.of(
                         createDiscussion(createMessage("user1", "comment")),
@@ -135,9 +145,10 @@ class DiscussionContentProviderTest {
                 "comment2" + System.lineSeparator() +
                 "---";
                 
-        String content = discussionContentProvider.getContentText();
+        String content = discussionContentProvider.getContentText().orElse("");
         
         assertEquals(expected, content);
+        verify(mrReaderService, times(1)).isAvailable();
         verify(mrReaderService, times(1)).getThreads();
     }
 }

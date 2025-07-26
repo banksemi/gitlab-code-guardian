@@ -1,5 +1,6 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
+import kr.easylab.gitlab_code_guardian.provider.content.service.sha.FileMapContentProvider;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class FileMapContentProviderTest {
         FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockShaFileSnapshotService);
 
         // When
-        String content = fileMapContentProvider.getContentText();
+        String content = fileMapContentProvider.getContentText().orElse("");
 
         // Then
         assertEquals("", content);
@@ -53,7 +54,7 @@ class FileMapContentProviderTest {
         FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockShaFileSnapshotService);
 
         // When
-        String content = fileMapContentProvider.getContentText();
+        String content = fileMapContentProvider.getContentText().orElse("");
 
         // Then
         assertEquals("src/main/java/Test.java", content);
@@ -75,7 +76,7 @@ class FileMapContentProviderTest {
         FileMapContentProvider fileMapContentProvider = new FileMapContentProvider(mockShaFileSnapshotService);
 
         // When
-        String content = fileMapContentProvider.getContentText();
+        String content = fileMapContentProvider.getContentText().orElse("");
 
         // Then
         String expected = "src/main/java/File1.java\nsrc/main/java/File2.java\nsrc/test/java/TestFile.java";

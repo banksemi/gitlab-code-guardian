@@ -1,11 +1,13 @@
-package kr.easylab.gitlab_code_guardian.provider.content.service;
+package kr.easylab.gitlab_code_guardian.provider.content.service.sha;
 
+import kr.easylab.gitlab_code_guardian.provider.content.service.ContentProvider;
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.DiffFile;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +20,7 @@ public class DiffContentProvider implements ContentProvider {
     }
 
     @Override
-    public String getContentText() {
+    public Optional<String> getContentText() {
         List<DiffFile> diffs = shaFileSnapshotService.getDiff();
         StringBuilder sb = new StringBuilder();
         for (DiffFile diff : diffs) {
@@ -35,6 +37,9 @@ public class DiffContentProvider implements ContentProvider {
                     .append(System.lineSeparator());
 
         }
-        return sb.toString();
+        if (sb.isEmpty())
+            return Optional.empty();
+        else
+            return Optional.of(sb.toString().trim());
     }
 }

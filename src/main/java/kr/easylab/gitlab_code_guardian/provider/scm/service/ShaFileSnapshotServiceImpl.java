@@ -55,13 +55,16 @@ public class ShaFileSnapshotServiceImpl implements ShaFileSnapshotService {
     public List<DiffFile> getDiff() {
         gitlabMRContext.updateShaFromMR();
         try {
-            MergeRequest mr = gitlabMRContext.getMergeRequest();
-
-            // 브랜치 (소스, 타켓)은 변경되었을 수 있으니 MR에 명시된 Ref로 직접 비교
-            DiffRef refs = mr.getDiffRefs();
-            CompareResults compareResults = gitlabMRContext.getGitLabApi()
+            CompareResults compareResults = gitlabMRContext
+                    .getGitLabApi()
                     .getRepositoryApi()
-                    .compare(gitlabMRContext.getRepositoryId(), refs.getBaseSha(), refs.getHeadSha(), null, false);
+                    .compare(
+                            gitlabMRContext.getRepositoryId(),
+                            gitlabMRContext.getBaseSha() ,
+                            gitlabMRContext.getHeadSha(),
+                            null,
+                            false
+                    );
 
             return compareResults.getDiffs()
                     .stream()

@@ -1,10 +1,13 @@
-package kr.easylab.gitlab_code_guardian.provider.content.service;
+package kr.easylab.gitlab_code_guardian.provider.content.service.sha;
 
 import kr.easylab.gitlab_code_guardian.provider.content.dto.FilePathsResponse;
+import kr.easylab.gitlab_code_guardian.provider.content.service.ContentProvider;
 import kr.easylab.gitlab_code_guardian.provider.content.service.util.RelevantFilePathFinder;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +22,15 @@ public class ExtendedFileContentProvider implements ContentProvider {
     }
 
     @Override
-    public String getContentText() {
+    public Optional<String> getContentText() {
         // 수정 내용과 연관성 있는 파일들을 식별
+        Optional<String> diffText = diffContentProvider.getContentText();
+        if (diffText.isEmpty())
+            return Optional.empty();
+
         FilePathsResponse pathsResponse = relevantFilePathFinder.findRelevantFilePaths(
                 shaFileSnapshotService.getFilePaths(),
-                diffContentProvider.getContentText()
+                diffText.get()
         );
 
         // 받은 경로를 기반으로 File을 불러와 Content에 포함
@@ -35,6 +42,6 @@ public class ExtendedFileContentProvider implements ContentProvider {
             sb.append("```").append(System.lineSeparator());
             sb.append(System.lineSeparator());
         }
-        return sb.toString().trim();
+        return Optional.of(sb.toString().trim());
     }
 }

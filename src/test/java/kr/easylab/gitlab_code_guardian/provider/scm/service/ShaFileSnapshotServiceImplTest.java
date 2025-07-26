@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ShaFileSnapshotServiceImplTest {
 
     @Mock
@@ -47,8 +50,18 @@ class ShaFileSnapshotServiceImplTest {
         lenient().when(gitlabMRContext.getGitLabApi()).thenReturn(gitLabApi);
         lenient().when(gitlabMRContext.getRepositoryId()).thenReturn(repositoryId);
         lenient().when(gitlabMRContext.getHeadSha()).thenReturn(headSha);
+        lenient().when(gitlabMRContext.getBaseSha()).thenReturn("base123");
+        lenient().doNothing().when(gitlabMRContext).updateShaFromMR();
         lenient().when(gitLabApi.getRepositoryApi()).thenReturn(repositoryApi);
         lenient().when(gitLabApi.getRepositoryFileApi()).thenReturn(repositoryFileApi);
+        
+        // Default MergeRequest setup for getDiff tests
+        MergeRequest defaultMergeRequest = new MergeRequest();
+        DiffRef defaultDiffRef = new DiffRef();
+        defaultDiffRef.setBaseSha("base123");
+        defaultDiffRef.setHeadSha("head456");
+        defaultMergeRequest.setDiffRefs(defaultDiffRef);
+        lenient().when(gitlabMRContext.getMergeRequest()).thenReturn(defaultMergeRequest);
     }
 
     @Test
@@ -152,14 +165,6 @@ class ShaFileSnapshotServiceImplTest {
     @DisplayName("getDiff - 정상적인 diff 결과를 반환한다")
     void getDiff_shouldReturnDiffFiles() throws GitLabApiException {
         // Given
-        MergeRequest mergeRequest = new MergeRequest();
-        DiffRef diffRef = new DiffRef();
-        diffRef.setBaseSha("base123");
-        diffRef.setHeadSha("head456");
-        mergeRequest.setDiffRefs(diffRef);
-
-        when(gitlabMRContext.getMergeRequest()).thenReturn(mergeRequest);
-
         Diff diff1 = new Diff();
         diff1.setNewPath("file1.java");
         diff1.setOldPath("file1_old.java");
@@ -174,7 +179,7 @@ class ShaFileSnapshotServiceImplTest {
         CompareResults compareResults = new CompareResults();
         compareResults.setDiffs(List.of(diff1, diff2));
 
-        when(repositoryApi.compare(repositoryId, "base123", "head456", null, false))
+        when(repositoryApi.compare(repositoryId, "base123", "abc123", null, false))
                 .thenReturn(compareResults);
 
         // When
@@ -194,22 +199,15 @@ class ShaFileSnapshotServiceImplTest {
         assertEquals("diff content 2", resultDiff2.getDiff());
         assertTrue(resultDiff2.getDeleted());
 
-        verify(gitlabMRContext).updateShaFromMR();
-        verify(gitlabMRContext).getMergeRequest();
+        verify(gitlabMRContext, atLeastOnce()).updateShaFromMR();
+        verify(repositoryApi).compare(repositoryId, "base123", "abc123", null, false);
     }
 
     @Test
     @DisplayName("getDiff - GitLabApiException 발생 시 IllegalStateException을 던진다")
     void getDiff_whenGitLabApiException_shouldThrowIllegalStateException() throws GitLabApiException {
         // Given
-        MergeRequest mergeRequest = new MergeRequest();
-        DiffRef diffRef = new DiffRef();
-        diffRef.setBaseSha("base123");
-        diffRef.setHeadSha("head456");
-        mergeRequest.setDiffRefs(diffRef);
-
-        when(gitlabMRContext.getMergeRequest()).thenReturn(mergeRequest);
-        when(repositoryApi.compare(repositoryId, "base123", "head456", null, false))
+        when(repositoryApi.compare(repositoryId, "base123", "abc123", null, false))
                 .thenThrow(new GitLabApiException("Compare failed"));
 
         // When & Then
@@ -217,6 +215,7 @@ class ShaFileSnapshotServiceImplTest {
                 () -> shaFileSnapshotService.getDiff());
         
         assertEquals("Diff 정보를 가져오는 데 실패했습니다.", exception.getMessage());
-        verify(gitlabMRContext).updateShaFromMR();
+        verify(gitlabMRContext, atLeastOnce()).updateShaFromMR();
+        verify(repositoryApi).compare(repositoryId, "base123", "abc123", null, false);
     }
 }

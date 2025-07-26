@@ -1,10 +1,10 @@
 package kr.easylab.gitlab_code_guardian.provider.content.service;
 
-import kr.easylab.gitlab_code_guardian.llm.service.LLMService;
 import kr.easylab.gitlab_code_guardian.provider.content.dto.FilePathsResponse;
+import kr.easylab.gitlab_code_guardian.provider.content.service.sha.DiffContentProvider;
+import kr.easylab.gitlab_code_guardian.provider.content.service.sha.ExtendedFileContentProvider;
 import kr.easylab.gitlab_code_guardian.provider.content.service.util.RelevantFilePathFinder;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.ShaFileSnapshotService;
-import kr.easylab.gitlab_code_guardian.review.service.ContentAggregator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -45,7 +46,7 @@ class ExtendedFileContentProviderTest {
         // Given
         when(shaFileSnapshotService.getFilePaths()).thenReturn(List.of("Test1.java", "src/test/java/Test.java"));
         when(shaFileSnapshotService.getFileContent(eq("Test1.java"))).thenReturn("content");
-        when(diffContentProvider.getContentText()).thenReturn("Diff content");
+        when(diffContentProvider.getContentText()).thenReturn(Optional.of("Diff content"));
         when(relevantFilePathFinder.findRelevantFilePaths(
                 List.of("Test1.java", "src/test/java/Test.java"),
                 "Diff content"
@@ -53,7 +54,7 @@ class ExtendedFileContentProviderTest {
                 FilePathsResponse.builder().filePaths(List.of("Test1.java")).build()
         );
         // When
-        String content = extendedFileContentProvider.getContentText();
+        String content = extendedFileContentProvider.getContentText().orElse("");
 
         // Then
         assertLinesMatch("""
