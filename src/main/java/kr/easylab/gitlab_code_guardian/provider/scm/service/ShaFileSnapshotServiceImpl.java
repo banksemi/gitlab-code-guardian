@@ -3,6 +3,7 @@ package kr.easylab.gitlab_code_guardian.provider.scm.service;
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.DiffFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.*;
 import org.springframework.stereotype.Service;
@@ -14,20 +15,24 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ShaFileSnapshotServiceImpl implements ShaFileSnapshotService {
-    private final GitlabMRContext gitlabMRContext;
+    private final SCMContext scmContext;
+    private final GitLabApi gitLabApi;
 
     @Override
     public List<String> getFilePaths() {
-        gitlabMRContext.updateShaFromMR();
         List<String> allFilePaths = new ArrayList<>();
         List<TreeItem> treeItems = null;
         try {
-            treeItems = gitlabMRContext.getGitLabApi()
+            treeItems = gitLabApi
                     .getRepositoryApi()
-                    .getTree(gitlabMRContext.getRepositoryId(), "", gitlabMRContext.getHeadSha(), true);
+                    .getTree(scmContext.getSCMInformation().getRepositoryId(), "", scmContext.getSCMInformation().getHeadSha(), true);
             for (TreeItem item : treeItems) {
                 if (item.getType() == TreeItem.Type.BLOB) {
-                    log.debug("파일 경로 추가 (path: {}, repositoryId: {})", item.getPath(), gitlabMRContext.getRepositoryId());
+                    log.debug(
+                            "파일 경로 추가 (path: {}, repositoryId: {})",
+                            item.getPath(),
+                            scmContext.getSCMInformation().getRepositoryId()
+                    );
                     allFilePaths.add(item.getPath());
                 }
             }
@@ -39,11 +44,14 @@ public class ShaFileSnapshotServiceImpl implements ShaFileSnapshotService {
 
     @Override
     public String getFileContent(String filePath) {
-        gitlabMRContext.updateShaFromMR();
     try {
-            return gitlabMRContext.getGitLabApi()
+            return gitLabApi
                     .getRepositoryFileApi()
-                    .getFile(gitlabMRContext.getRepositoryId(), filePath, gitlabMRContext.getHeadSha()).getDecodedContentAsString();
+                    .getFile(
+                            scmContext.getSCMInformation().getRepositoryId(),
+                            filePath,
+                            scmContext.getSCMInformation().getHeadSha()
+                    ).getDecodedContentAsString();
 
         } catch (GitLabApiException e) {
             log.error("파일 내용을 가져오는데 실패했습니다.", e);
@@ -53,15 +61,13 @@ public class ShaFileSnapshotServiceImpl implements ShaFileSnapshotService {
 
     @Override
     public List<DiffFile> getDiff() {
-        gitlabMRContext.updateShaFromMR();
         try {
-            CompareResults compareResults = gitlabMRContext
-                    .getGitLabApi()
+            CompareResults compareResults = gitLabApi
                     .getRepositoryApi()
                     .compare(
-                            gitlabMRContext.getRepositoryId(),
-                            gitlabMRContext.getBaseSha() ,
-                            gitlabMRContext.getHeadSha(),
+                            scmContext.getSCMInformation().getRepositoryId(),
+                            scmContext.getSCMInformation().getBaseSha() ,
+                            scmContext.getSCMInformation().getHeadSha(),
                             null,
                             false
                     );

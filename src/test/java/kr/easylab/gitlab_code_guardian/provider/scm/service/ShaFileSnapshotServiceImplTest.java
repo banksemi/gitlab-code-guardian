@@ -1,6 +1,7 @@
 package kr.easylab.gitlab_code_guardian.provider.scm.service;
 
 import kr.easylab.gitlab_code_guardian.provider.scm.dto.DiffFile;
+import kr.easylab.gitlab_code_guardian.provider.scm.dto.SCMInformation;
 import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.RepositoryApi;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.lenient;
 class ShaFileSnapshotServiceImplTest {
 
     @Mock
-    private GitlabMRContext gitlabMRContext;
+    private SCMContext SCMContext;
 
     @Mock
     private GitLabApi gitLabApi;
@@ -47,21 +48,15 @@ class ShaFileSnapshotServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(gitlabMRContext.getGitLabApi()).thenReturn(gitLabApi);
-        lenient().when(gitlabMRContext.getRepositoryId()).thenReturn(repositoryId);
-        lenient().when(gitlabMRContext.getHeadSha()).thenReturn(headSha);
-        lenient().when(gitlabMRContext.getBaseSha()).thenReturn("base123");
-        lenient().doNothing().when(gitlabMRContext).updateShaFromMR();
+        SCMInformation scmInformation = SCMInformation.builder()
+                .repositoryId(repositoryId)
+                .headSha(headSha)
+                .baseSha("base123")
+                .build();
+        
+        lenient().when(SCMContext.getSCMInformation()).thenReturn(scmInformation);
         lenient().when(gitLabApi.getRepositoryApi()).thenReturn(repositoryApi);
         lenient().when(gitLabApi.getRepositoryFileApi()).thenReturn(repositoryFileApi);
-        
-        // Default MergeRequest setup for getDiff tests
-        MergeRequest defaultMergeRequest = new MergeRequest();
-        DiffRef defaultDiffRef = new DiffRef();
-        defaultDiffRef.setBaseSha("base123");
-        defaultDiffRef.setHeadSha("head456");
-        defaultMergeRequest.setDiffRefs(defaultDiffRef);
-        lenient().when(gitlabMRContext.getMergeRequest()).thenReturn(defaultMergeRequest);
     }
 
     @Test
@@ -76,7 +71,6 @@ class ShaFileSnapshotServiceImplTest {
 
         // Then
         assertTrue(result.isEmpty());
-        verify(gitlabMRContext).updateShaFromMR();
         verify(repositoryApi).getTree(repositoryId, "", headSha, true);
     }
 
@@ -108,7 +102,6 @@ class ShaFileSnapshotServiceImplTest {
         assertTrue(result.contains("src/main/java/Test.java"));
         assertTrue(result.contains("README.md"));
         assertFalse(result.contains("src/main/java"));
-        verify(gitlabMRContext).updateShaFromMR();
     }
 
     @Test
@@ -120,7 +113,6 @@ class ShaFileSnapshotServiceImplTest {
 
         // When & Then
         assertThrows(RuntimeException.class, () -> shaFileSnapshotService.getFilePaths());
-        verify(gitlabMRContext).updateShaFromMR();
     }
 
     @Test
@@ -141,7 +133,6 @@ class ShaFileSnapshotServiceImplTest {
 
         // Then
         assertEquals(expectedContent, result);
-        verify(gitlabMRContext).updateShaFromMR();
         verify(repositoryFileApi).getFile(repositoryId, filePath, headSha);
     }
 
@@ -158,7 +149,6 @@ class ShaFileSnapshotServiceImplTest {
 
         // Then
         assertNull(result);
-        verify(gitlabMRContext).updateShaFromMR();
     }
 
     @Test
@@ -199,7 +189,6 @@ class ShaFileSnapshotServiceImplTest {
         assertEquals("diff content 2", resultDiff2.getDiff());
         assertTrue(resultDiff2.getDeleted());
 
-        verify(gitlabMRContext, atLeastOnce()).updateShaFromMR();
         verify(repositoryApi).compare(repositoryId, "base123", "abc123", null, false);
     }
 
@@ -215,7 +204,6 @@ class ShaFileSnapshotServiceImplTest {
                 () -> shaFileSnapshotService.getDiff());
         
         assertEquals("Diff 정보를 가져오는 데 실패했습니다.", exception.getMessage());
-        verify(gitlabMRContext, atLeastOnce()).updateShaFromMR();
         verify(repositoryApi).compare(repositoryId, "base123", "abc123", null, false);
     }
 }

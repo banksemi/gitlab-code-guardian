@@ -10,10 +10,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class GitlabWebhookEventValidator implements WebhookEventValidator {
-    private final GitlabMRContext gitlabMRContext;
-
-    private NoteEvent getCurrentNoteEvent() {
-        NoteEvent noteEvent = gitlabMRContext.getNoteEvent();
+    private NoteEvent getCurrentNoteEvent(NoteEvent noteEvent) {
         if (noteEvent == null) {
             throw new IllegalStateException("NoteEvent is null.");
         }
@@ -21,8 +18,8 @@ public class GitlabWebhookEventValidator implements WebhookEventValidator {
     }
 
     @Override
-    public boolean validateMRComment() {
-        NoteEvent.NoteableType noteableType = getCurrentNoteEvent().getObjectAttributes().getNoteableType();
+    public boolean validateMRComment(NoteEvent noteEvent) {
+        NoteEvent.NoteableType noteableType = noteEvent.getObjectAttributes().getNoteableType();
         if (noteableType == null || !noteableType.equals(NoteEvent.NoteableType.MERGE_REQUEST)) {
             log.warn("Not target NoteableType: {}", noteableType);
             return false;
@@ -31,13 +28,12 @@ public class GitlabWebhookEventValidator implements WebhookEventValidator {
     }
 
     @Override
-    public boolean validateNewThread() {
+    public boolean validateNewThread(NoteEvent noteEvent) {
         return true;
     }
 
     @Override
-    public boolean validateCreated() {
-        NoteEvent noteEvent = getCurrentNoteEvent();
+    public boolean validateCreated(NoteEvent noteEvent) {
         if (!noteEvent.getObjectAttributes().getCreatedAt().equals(
                 noteEvent.getObjectAttributes().getUpdatedAt()
         )) {
@@ -49,8 +45,8 @@ public class GitlabWebhookEventValidator implements WebhookEventValidator {
     }
 
     @Override
-    public boolean validateNotSelfInvolved(String botId) {
-        String user = getCurrentNoteEvent().getUser().getUsername();
+    public boolean validateNotSelfInvolved(NoteEvent noteEvent, String botId) {
+        String user = noteEvent.getUser().getUsername();
         log.info("User: {}", user);
         if (user.equals(botId)) {
             log.warn("Bot user: {}", user);
@@ -60,8 +56,8 @@ public class GitlabWebhookEventValidator implements WebhookEventValidator {
     }
 
     @Override
-    public boolean validateBotMention(String botId) {
-        String body = getCurrentNoteEvent().getObjectAttributes().getNote();
+    public boolean validateBotMention(NoteEvent noteEvent, String botId) {
+        String body = noteEvent.getObjectAttributes().getNote();
         if (!body.contains("@" + botId)) {
             log.warn("Not target user: {}", body);
             return false;
@@ -70,8 +66,8 @@ public class GitlabWebhookEventValidator implements WebhookEventValidator {
     }
 
     @Override
-    public boolean validateRepository(List<String> repositoryNames) {
-        String repositoryId = getCurrentNoteEvent().getProject().getPathWithNamespace();
+    public boolean validateRepository(NoteEvent noteEvent, List<String> repositoryNames) {
+        String repositoryId = noteEvent.getProject().getPathWithNamespace();
 
         for (String repositoryName : repositoryNames) {
             if (repositoryId.equals(repositoryName)) {

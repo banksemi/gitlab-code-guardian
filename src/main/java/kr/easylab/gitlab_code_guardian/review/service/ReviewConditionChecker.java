@@ -3,6 +3,7 @@ package kr.easylab.gitlab_code_guardian.review.service;
 import kr.easylab.gitlab_code_guardian.provider.scm.service.WebhookEventValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.gitlab4j.api.webhook.NoteEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,33 +26,33 @@ public class ReviewConditionChecker {
         this.repositoryName = repositoryName;
     }
 
-    public boolean isAllowed() {
-        if (!webhookEventValidator.validateMRComment()) {
+    public boolean isAllowed(NoteEvent noteEvent) {
+        if (!webhookEventValidator.validateMRComment(noteEvent)) {
             log.warn("Not MR Comment");
             return false;
         }
 
-        if (!webhookEventValidator.validateNewThread()) {
+        if (!webhookEventValidator.validateNewThread(noteEvent)) {
             log.warn("Not New Thread");
             return false;
         }
 
-        if (!webhookEventValidator.validateCreated()) {
+        if (!webhookEventValidator.validateCreated(noteEvent)) {
             log.warn("Not Created Event");
             return false;
         }
 
-        if (!webhookEventValidator.validateNotSelfInvolved(botId)) {
+        if (!webhookEventValidator.validateNotSelfInvolved(noteEvent, botId)) {
             log.warn("Self Involved");
             return false;
         }
 
-        if (!webhookEventValidator.validateBotMention(botId)) {
+        if (!webhookEventValidator.validateBotMention(noteEvent, botId)) {
             log.warn("Not Bot Mention");
             return false;
         }
 
-        if (!webhookEventValidator.validateRepository(List.of(repositoryName))) {
+        if (!webhookEventValidator.validateRepository(noteEvent, List.of(repositoryName))) {
             log.warn("Not Target Repository");
             return false;
         }

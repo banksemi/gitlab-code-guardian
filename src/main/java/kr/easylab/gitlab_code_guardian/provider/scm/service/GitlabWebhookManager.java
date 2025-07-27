@@ -1,6 +1,7 @@
 package kr.easylab.gitlab_code_guardian.provider.scm.service;
 
 import kr.easylab.gitlab_code_guardian.provider.notify.service.NotificationService;
+import kr.easylab.gitlab_code_guardian.provider.scm.dto.SCMInformation;
 import kr.easylab.gitlab_code_guardian.review.dto.MRReview;
 import kr.easylab.gitlab_code_guardian.review.exception.NotAllowedException;
 import kr.easylab.gitlab_code_guardian.review.service.MergeRequestReviewService;
@@ -18,10 +19,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class GitlabWebhookManager extends WebHookManager {
     public GitlabWebhookManager(
-            GitlabMRContext gitlabMRContext,
+            SCMContext scmContext,
             MergeRequestReviewService mergeRequestReviewService,
             ReviewConditionChecker reviewConditionChecker,
             NotificationService notificationService,
+            MRReaderService mrReaderService,
             @Value("${gitlab.webhook_secret}") String webhookSecret
     ) {
         super(webhookSecret);
@@ -30,18 +32,23 @@ public class GitlabWebhookManager extends WebHookManager {
             @Override
             public void onNoteEvent(NoteEvent noteEvent) {
                 String repositoryId = noteEvent.getProject().getPathWithNamespace();
-                Long mrId   = noteEvent.getMergeRequest().getIid();
+                Long mrId = noteEvent.getMergeRequest().getIid();
+                scmContext.setSCMInformation(
+                        SCMInformation.builder()
+                        .repositoryId(repositoryId)
+                        .mrId(mrId)
+                        .build()
+                );
 
-                gitlabMRContext.setMrId(mrId);
-                gitlabMRContext.setRepositoryId(repositoryId);
-                gitlabMRContext.setNoteEvent(noteEvent);
-
-                if (!reviewConditionChecker.isAllowed()) {
+                if (!reviewConditionChecker.isAllowed(
+                        noteEvent
+                )) {
                     throw new NotAllowedException(
                             "Not allowed to review this merge request."
                     );
                 }
 
+                mrReaderService.updateShaFromMR();
                 notificationService.sendNotification("리뷰를 시작합니다.");
                 MRReview review = mergeRequestReviewService.review();
                 notificationService.sendNotification(review);

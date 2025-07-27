@@ -15,6 +15,9 @@ public interface MRReaderService {
     /** MR 번호, 본문, 생성일, 생성자 등 기본 정보를 가져옵니다. */
     MessageBase getInfo();
 
-    /** 해당 MR에 열린 토론(note)들을 가져옵니다.. */
+    /** 해당 MR에 열린 토론(note)들을 가져옵니다. */
     List<MRDiscussion> getThreads();
+
+    /** MR 정보를 기반으로 SHA 값을 갱신합니다. */
+    void updateShaFromMR();
 }

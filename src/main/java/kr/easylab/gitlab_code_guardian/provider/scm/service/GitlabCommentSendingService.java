@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class GitlabCommentSendingService implements CommentSendingService {
-    private final GitlabMRContext gitlabMRContext;
+    private final SCMContext scmContext;
     private final GitLabApi gitLabApi;
 
     @Override
     public void writeComment(String content) {
         try {
             gitLabApi.getDiscussionsApi().createMergeRequestDiscussion(
-                    gitlabMRContext.getRepositoryId(),
-                    gitlabMRContext.getMrId(),
+                    scmContext.getSCMInformation().getRepositoryId(),
+                    scmContext.getSCMInformation().getMrId(),
                     content,
                     null,
                     null,
@@ -33,7 +33,10 @@ public class GitlabCommentSendingService implements CommentSendingService {
     @Override
     public void writeComment(String filePath, Long fileLine, String content) {
         try {
-            MergeRequest mr = gitlabMRContext.getMergeRequest();
+            MergeRequest mr = gitLabApi.getMergeRequestApi().getMergeRequest(
+                    scmContext.getSCMInformation().getRepositoryId(),
+                    scmContext.getSCMInformation().getMrId()
+            );
             DiffRef refs = mr.getDiffRefs();
 
             Position position = new Position()
@@ -45,8 +48,8 @@ public class GitlabCommentSendingService implements CommentSendingService {
                     .withNewLine(fileLine.intValue());
 
             gitLabApi.getDiscussionsApi().createMergeRequestDiscussion(
-                    gitlabMRContext.getRepositoryId(),
-                    gitlabMRContext.getMrId(),
+                    scmContext.getSCMInformation().getRepositoryId(),
+                    scmContext.getSCMInformation().getMrId(),
                     content,
                     null,
                     null,
