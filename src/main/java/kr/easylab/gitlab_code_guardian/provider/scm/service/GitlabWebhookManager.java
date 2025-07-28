@@ -12,10 +12,10 @@ import org.gitlab4j.api.WebHookManager;
 import org.gitlab4j.api.webhook.NoteEvent;
 import org.gitlab4j.api.webhook.WebHookListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class GitlabWebhookManager extends WebHookManager {
     public GitlabWebhookManager(
@@ -27,7 +27,7 @@ public class GitlabWebhookManager extends WebHookManager {
             @Value("${gitlab.webhook_secret}") String webhookSecret
     ) {
         super(webhookSecret);
-
+        log.info("Gitlab Webhook Manager Initialized.");
         addListener(new WebHookListener() {
             @Override
             public void onNoteEvent(NoteEvent noteEvent) {
