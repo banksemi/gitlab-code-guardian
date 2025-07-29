@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class GitlabMRReaderService implements MRReaderService {
     private final GitLabApi gitLabApi;
     private final SCMContext scmContext;
-    private Long mrIdForShaUpdating;
 
     @Override
     public Boolean isAvailable() {
@@ -107,23 +106,20 @@ public class GitlabMRReaderService implements MRReaderService {
         if (scmInformation != null) {
             newMrId = scmInformation.getMrId();
         }
-        if (!Objects.equals(newMrId, this.mrIdForShaUpdating)) {
-            if (newMrId != null) {
-                try {
-                    MergeRequest mr = gitLabApi.getMergeRequestApi().getMergeRequest(
-                            scmInformation.getRepositoryId(),
-                            newMrId
-                    );
-                    DiffRef refs = mr.getDiffRefs();
-                    scmInformation.setBaseSha(refs.getBaseSha());
-                    scmInformation.setHeadSha(refs.getHeadSha());
-                    log.info("BaseSha: {}, HeadSha: {}", refs.getBaseSha(), refs.getHeadSha());
-                } catch (GitLabApiException e) {
-                    log.error("SHA를 업데이트하는데 실패했습니다.", e);
-                    throw new IllegalStateException("SHA를 업데이트하는데 실패했습니다.", e);
-                }
+        if (newMrId != null) {
+            try {
+                MergeRequest mr = gitLabApi.getMergeRequestApi().getMergeRequest(
+                        scmInformation.getRepositoryId(),
+                        newMrId
+                );
+                DiffRef refs = mr.getDiffRefs();
+                scmInformation.setBaseSha(refs.getBaseSha());
+                scmInformation.setHeadSha(refs.getHeadSha());
+                log.info("BaseSha: {}, HeadSha: {}", refs.getBaseSha(), refs.getHeadSha());
+            } catch (GitLabApiException e) {
+                log.error("SHA를 업데이트하는데 실패했습니다.", e);
+                throw new IllegalStateException("SHA를 업데이트하는데 실패했습니다.", e);
             }
-            this.mrIdForShaUpdating = newMrId;
         }
     }
 }
