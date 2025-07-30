@@ -8,10 +8,6 @@ import java.util.Optional;
 @Data
 @Builder
 public class LLMConfig {
-    public enum ThinkingMode {
-        yes,
-        no
-    }
     private String prompt;
-    private ThinkingMode thinking;
+    private Long thinkingBudget = null;
 }

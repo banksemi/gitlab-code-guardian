@@ -40,7 +40,10 @@ public class MergeRequestReviewServiceImpl implements MergeRequestReviewService 
         // 리뷰를 위한 MR 컨텍스트 추가
         messages.addAll(contentAggregator.aggregate());
 
-        LLMConfig llmConfig = LLMConfig.builder().prompt(systemPrompt).build();
+        LLMConfig llmConfig = LLMConfig.builder()
+                .prompt(systemPrompt)
+                .thinkingBudget(32768L)
+                .build();
         log.info("LLM Config: {}", llmConfig);
         log.info("LLM Messages: {}", messages);
         return llmService.generate(messages, MRReview.class, llmConfig);

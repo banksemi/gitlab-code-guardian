@@ -32,7 +32,9 @@ public class LLMBasedRelevantFilePathFinder implements RelevantFilePathFinder {
                 FilePathsResponse.class
                 , LLMConfig.builder()
                         .prompt(prompt.getPrompt())
+                                .thinkingBudget(512L)
                         .build()
+
         );
         if (pathsResponse == null || pathsResponse.getFilePaths() == null || pathsResponse.getFilePaths().isEmpty())
             return new FilePathsResponse(List.of());

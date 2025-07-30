@@ -66,8 +66,13 @@ public class GoogleLLMService implements LLMService {
     }
 
     private String call(LLMConfig llmConfig, List<LLMMessage> messages, GenerationConfig config) {
-        if (llmConfig.getThinking() == LLMConfig.ThinkingMode.no)
-            config.setThinkingConfig(ThinkingConfig.builder().thinkingBudget(0L).build());
+        if (llmConfig.getThinkingBudget() != null)
+            config.setThinkingConfig(
+                    ThinkingConfig.builder()
+                            .thinkingBudget(
+                                    llmConfig.getThinkingBudget()
+                            ).build()
+            );
         List<Content> contents = messages.stream().map(
                 message -> {
                     return Content.builder()
