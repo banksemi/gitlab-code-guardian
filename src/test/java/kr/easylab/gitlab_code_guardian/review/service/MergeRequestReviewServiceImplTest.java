@@ -60,7 +60,7 @@ class MergeRequestReviewServiceImplTest {
         verify(llmService).generate(List.of(
                 LLMMessage.builder().role(LLMMessage.Role.USER).text("유저 프롬프트").build(),
                 LLMMessage.builder().role(LLMMessage.Role.USER).text("Content1").build()
-        ), MRReview.class, LLMConfig.builder().prompt("시스템 프롬프트").build());
+        ), MRReview.class, LLMConfig.builder().prompt("시스템 프롬프트").thinkingBudget(32768L).build());
         assertEquals(response, review);
     }
 
@@ -87,7 +87,7 @@ class MergeRequestReviewServiceImplTest {
         // Then
         verify(llmService).generate(List.of(
                 LLMMessage.builder().role(LLMMessage.Role.USER).text("Content1").build()
-        ), MRReview.class, LLMConfig.builder().prompt("시스템 프롬프트").build());
+        ), MRReview.class, LLMConfig.builder().prompt("시스템 프롬프트").thinkingBudget(32768L).build());
         assertEquals(response, review);
     }
 }
