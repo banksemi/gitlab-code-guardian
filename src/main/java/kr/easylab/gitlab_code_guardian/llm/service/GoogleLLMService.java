@@ -73,6 +73,7 @@ public class GoogleLLMService implements LLMService {
                                     llmConfig.getThinkingBudget()
                             ).build()
             );
+        config.setTemperature(0.1f);
         List<Content> contents = messages.stream().map(
                 message -> {
                     return Content.builder()

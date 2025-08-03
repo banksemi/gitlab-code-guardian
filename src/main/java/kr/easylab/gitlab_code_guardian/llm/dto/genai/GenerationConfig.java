@@ -14,4 +14,5 @@ public class GenerationConfig {
     private String responseMimeType;
     private Map<String, Object> responseSchema;
     private ThinkingConfig thinkingConfig;
+    private Float temperature;
 }
