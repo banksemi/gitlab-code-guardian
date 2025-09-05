@@ -19,6 +19,7 @@ import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -129,7 +130,7 @@ class ShaFileSnapshotServiceImplTest {
                 .thenReturn(repositoryFile);
 
         // When
-        String result = shaFileSnapshotService.getFileContent(filePath);
+        String result = shaFileSnapshotService.getFileContent(filePath).get();
 
         // Then
         assertEquals(expectedContent, result);
@@ -137,7 +138,7 @@ class ShaFileSnapshotServiceImplTest {
     }
 
     @Test
-    @DisplayName("getFileContent - GitLabApiException 발생 시 null을 반환한다")
+    @DisplayName("getFileContent - GitLabApiException 발생 시 Optional.empty를 반환한다")
     void getFileContent_whenGitLabApiException_shouldReturnNull() throws GitLabApiException {
         // Given
         String filePath = "src/main/java/Test.java";
@@ -145,10 +146,10 @@ class ShaFileSnapshotServiceImplTest {
                 .thenThrow(new GitLabApiException("File not found"));
 
         // When
-        String result = shaFileSnapshotService.getFileContent(filePath);
+        Optional<String> result = shaFileSnapshotService.getFileContent(filePath);
 
         // Then
-        assertNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test

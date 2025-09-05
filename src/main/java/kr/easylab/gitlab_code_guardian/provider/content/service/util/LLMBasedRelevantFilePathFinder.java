@@ -17,9 +17,17 @@ public class LLMBasedRelevantFilePathFinder implements RelevantFilePathFinder {
     private final RelevantFilePathFinderPrompt prompt;
 
     @Override
-    public FilePathsResponse findRelevantFilePaths(List<String> filePaths, String diffContent) {
+    public FilePathsResponse findRelevantFilePaths(
+            List<String> filePaths,
+            String diffContent,
+            String addedContext
+    ) {
         FilePathsResponse pathsResponse = llmService.generate(
                 List.of(
+                        LLMMessage.builder()
+                                .role(LLMMessage.Role.USER)
+                                .text(addedContext)
+                                .build(),
                         LLMMessage.builder()
                                 .role(LLMMessage.Role.USER)
                                 .text("## 코드 변경사항" + System.lineSeparator() + diffContent)
@@ -32,7 +40,7 @@ public class LLMBasedRelevantFilePathFinder implements RelevantFilePathFinder {
                 FilePathsResponse.class
                 , LLMConfig.builder()
                         .prompt(prompt.getPrompt())
-                                .thinkingBudget(512L)
+                                .thinkingBudget(2048L)
                         .build()
 
         );

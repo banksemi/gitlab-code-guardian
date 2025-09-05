@@ -113,6 +113,8 @@ public class GoogleLLMService implements LLMService {
                 .block();
 
         Content responseContent = responseString.getCandidates().get(0).getContent();
+        if (responseContent.getParts() == null)
+            return null;
         for (Part part : responseContent.getParts()) {
             if (part.getText() != null) {
                 log.info("API Response:\n{}", part.getText());
@@ -134,6 +136,8 @@ public class GoogleLLMService implements LLMService {
                         .responseSchema(stringObjectMap)
                         .build()
         );
+        if (responseText == null)
+            return null;
 
         try {
             return objectMapper.readValue(responseText, clazz);

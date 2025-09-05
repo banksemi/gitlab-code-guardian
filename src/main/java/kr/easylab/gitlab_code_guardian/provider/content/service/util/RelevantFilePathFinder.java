@@ -5,5 +5,9 @@ import kr.easylab.gitlab_code_guardian.provider.content.dto.FilePathsResponse;
 import java.util.List;
 
 public interface RelevantFilePathFinder {
-    FilePathsResponse findRelevantFilePaths(List<String> filePaths, String diffContent);
+    FilePathsResponse findRelevantFilePaths(
+            List<String> filePaths,
+            String diffContent,
+            String addedContext
+    );
 }

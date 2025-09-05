@@ -45,14 +45,28 @@ class ExtendedFileContentProviderTest {
     void getContentText() {
         // Given
         when(shaFileSnapshotService.getFilePaths()).thenReturn(List.of("Test1.java", "src/test/java/Test.java"));
-        when(shaFileSnapshotService.getFileContent(eq("Test1.java"))).thenReturn("content");
+        when(shaFileSnapshotService.getFileContent(eq("Test1.java"))).thenReturn(Optional.of("content"));
         when(diffContentProvider.getContentText()).thenReturn(Optional.of("Diff content"));
+
         when(relevantFilePathFinder.findRelevantFilePaths(
-                List.of("Test1.java", "src/test/java/Test.java"),
-                "Diff content"
+                eq(List.of("Test1.java", "src/test/java/Test.java")),
+                eq("Diff content"),
+                eq("## 현재까지 읽은 파일 내용\n")
         )).thenReturn(
                 FilePathsResponse.builder().filePaths(List.of("Test1.java")).build()
         );
+
+        when(relevantFilePathFinder.findRelevantFilePaths(
+                eq(List.of("Test1.java", "src/test/java/Test.java")),
+                eq("Diff content"),
+                eq("## 현재까지 읽은 파일 내용\n**Test1.java**" + System.lineSeparator() +
+                   "```" + System.lineSeparator() +
+                   "content" + System.lineSeparator() +
+                   "```")
+        )).thenReturn(
+                FilePathsResponse.builder().filePaths(List.of()).build()
+        );
+
         // When
         String content = extendedFileContentProvider.getContentText().orElse("");
 

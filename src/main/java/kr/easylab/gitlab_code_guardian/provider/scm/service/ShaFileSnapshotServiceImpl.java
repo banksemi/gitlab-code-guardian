@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -43,19 +44,20 @@ public class ShaFileSnapshotServiceImpl implements ShaFileSnapshotService {
     }
 
     @Override
-    public String getFileContent(String filePath) {
-    try {
-            return gitLabApi
+    public Optional<String> getFileContent(String filePath) {
+        try {
+            log.info("파일 내용을 가져오는 중: {}", filePath);
+            String decodedContent = gitLabApi
                     .getRepositoryFileApi()
                     .getFile(
                             scmContext.getSCMInformation().getRepositoryId(),
                             filePath,
                             scmContext.getSCMInformation().getHeadSha()
                     ).getDecodedContentAsString();
-
+            return Optional.of(decodedContent);
         } catch (GitLabApiException e) {
-            log.error("파일 내용을 가져오는데 실패했습니다.", e);
-            return null;
+            log.error("{} 파일 내용을 가져오는데 실패했습니다.", filePath, e);
+            return Optional.empty();
         }
     }
 
